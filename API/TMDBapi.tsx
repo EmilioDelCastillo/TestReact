@@ -8,7 +8,7 @@ export type APIResult = {
 }
 
 // TResponce c'est juste un placeHolder pour le type de réponse de l'API
-export function getFilmsFromAPIWithSearchedText<TResponse>(text: String): Promise<TResponse> {
+export function getFilmsFromAPIWithSearchedText<TResponse>(text: string): Promise<TResponse> {
     const url = "https://api.themoviedb.org/3/search/movie?api_key=" + API_TOKEN + "&language=fr&query=" + text
 
     return fetch(url)
