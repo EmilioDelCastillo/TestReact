@@ -31,23 +31,41 @@ type State = {
 // Il faut une valeur par défaut pour props avant de pouvoir donner le type de state, d'où le {}
 class Search extends React.Component<{}, State> {
 
+    searchString: string
     constructor(props: {}) {
         super(props)
         this.state = { films: defaultFilms }
+        this.searchString = ""
     }
 
     private loadFilms() {
-        getFilmsFromAPIWithSearchedText<APIResult>("star").then(data => {
-            this.setState({films: data.results})
-        })
+        if (this.searchString.length > 0) {
+            getFilmsFromAPIWithSearchedText<APIResult>(this.searchString).then(data => {
+                this.setState({ films: data.results })
+            })
+        }
+    }
+
+    private updateSearchString(text: string) {
+        this.searchString = text
     }
 
     render() {
         return (
             // Ici on rend à l'écran les éléments graphiques de notre component custom Search
             <View style={styles.mainContainer}>
-                <TextInput style={[styles.textInput, { backgroundColor: 'cyan' }]}
-                    placeholder="Titre du film" />
+                <TextInput
+                    style={[styles.textInput, { backgroundColor: 'cyan' }]}
+                    placeholder="Titre du film"
+
+                    // A chaque nouveau caractère on met à jour la chaîne de caractères à chercher
+                    onChange={(event) => this.updateSearchString(event.nativeEvent.text)}
+
+                    // Lorsqu'on appuie sur "retour" ça charge la liste des films
+                    onSubmitEditing={(event) => {
+                        this.loadFilms()
+                    }}
+                />
                 <Button title="Rechercher" onPress={() => this.loadFilms()} />
 
                 <FlatList
