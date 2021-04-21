@@ -15,3 +15,10 @@ export function getFilmsFromAPIWithSearchedText<TResponse>(text: string): Promis
         .then(response => response.json())
         .then(data => data as TResponse)
 }
+
+/**
+ * Returns the URI to an image.
+ */
+export function getImageFromAPI(name: string) {
+    return 'https://image.tmdb.org/t/p/w300' + name
+}

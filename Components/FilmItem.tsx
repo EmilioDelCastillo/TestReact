@@ -1,5 +1,6 @@
 import React, { ReactNode } from "react";
 import { StyleSheet, Text, View, Image } from "react-native";
+import { getImageFromAPI } from "../API/TMDBapi";
 import type { Film } from '../Helpers/FilmsData'
 
 // Les props sont un objet, donc on fait un objet qui contient une propriété film de type Film
@@ -11,7 +12,7 @@ class FilmItem extends React.Component<{film: Film}> {
         return (
             <View style={styles.main_container}>
                 <Image style={styles.thumbnail}
-                    source={{ uri: "image" }} />
+                    source={{ uri: getImageFromAPI(film.poster_path) }} />
 
                 {/* Content */}
                 <View style={styles.content_container}>
