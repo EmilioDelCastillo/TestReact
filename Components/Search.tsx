@@ -5,7 +5,7 @@ import type { APIResult } from '../API/TMDBapi'
 
 import FilmItem from './FilmItem';
 import type { Film } from '../Helpers/FilmsData'
-import defaultFilms from '../Helpers/FilmsData'
+// import defaultFilms from '../Helpers/FilmsData'
 
 const styles = StyleSheet.create({
     mainContainer: {
@@ -43,21 +43,30 @@ type State = {
 class Search extends React.Component<{}, State> {
 
     searchString: string
+    currentPage: number
+    totalPages: number
+
     constructor(props: {}) {
         super(props)
         this.state = {
-            films: defaultFilms,
+            films: [],
             isLoading: false
         }
         this.searchString = ""
+        this.currentPage = 0
+        this.totalPages = 0
     }
 
     private loadFilms() {
         if (this.searchString.length > 0) {
             this.setState({ isLoading: true })
-            getFilmsFromAPIWithSearchedText<APIResult>(this.searchString).then(data => {
+            getFilmsFromAPIWithSearchedText<APIResult>(this.searchString, this.currentPage + 1).then(data => {
+                console.log(this.state.films.length)
+                this.currentPage = data.page
+                this.totalPages = data.total_pages
                 this.setState({
-                    films: data.results,
+                    // The first time we want to override the default films
+                    films: [...this.state.films, ...data.results],
                     isLoading: false
                 })
             })
@@ -78,6 +87,12 @@ class Search extends React.Component<{}, State> {
         }
     }
 
+    private resetSearch() {
+        this.currentPage = 0
+        this.totalPages = 0
+        this.setState({ films: [] })
+    }
+
     render() {
         return (
             // Ici on rend à l'écran les éléments graphiques de notre component custom Search
@@ -91,15 +106,25 @@ class Search extends React.Component<{}, State> {
 
                     // Lorsqu'on appuie sur "retour" ça charge la liste des films
                     onSubmitEditing={(event) => {
+                        this.resetSearch()
                         this.loadFilms()
                     }}
                 />
-                <Button title="Rechercher" onPress={() => this.loadFilms()} />
+                <Button title="Rechercher" onPress={() => {
+                    this.resetSearch()
+                    this.loadFilms()
+                }} />
 
                 <FlatList
                     data={this.state.films}
                     keyExtractor={(item) => item.id.toString()}
                     renderItem={({ item }) => <FilmItem film={item} />}
+                    onEndReachedThreshold={0.5}
+                    onEndReached={() => {
+                        if (this.currentPage < this.totalPages) {
+                            this.loadFilms()
+                        }
+                    }}
                 />
                 {this.displayActivityIndicator()}
             </View>
