@@ -18,6 +18,17 @@ export function getFilmsFromAPIWithSearchedText<TResponse>(text: string, page: n
 }
 
 /**
+ * Makes a network call to the API, and hopefully fetches a film with its identifier.
+ * It is up to the caller to implement the type of the film.
+ */
+export function getFilmById<TResponse>(filmId: string) {
+    const url = "https://api.themoviedb.org/3/movie/" + filmId + "?api_key=" + API_TOKEN + "&language=fr"
+    return fetch(url)
+        .then(response => response.json())
+        .then(data => data as TResponse)
+}
+
+/**
  * Returns the URI to an image.
  */
 export function getImageFromAPI(name: string) {
