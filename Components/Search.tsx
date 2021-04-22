@@ -5,8 +5,8 @@ import type { APIResult } from '../API/TMDBapi'
 
 import FilmItem from './FilmItem';
 import type { Film } from '../Helpers/FilmsData'
-import { NavigationParams, NavigationScreenProp, NavigationState } from 'react-navigation';
 import { NavigationComponents } from '../Navigation/NavigationHelper'
+import { NavigationProps } from '../Navigation/NavigationHelper';
 
 const styles = StyleSheet.create({
     mainContainer: {
@@ -34,23 +34,19 @@ const styles = StyleSheet.create({
     }
 })
 
-// Pour pouvoir utiliser la navigation, on doit indiquer le type d'objet utilisé
-type Props = {
-    navigation: NavigationScreenProp<NavigationState, NavigationParams>
-}
 // Pour pouvoir donner une propriété à state, on crée un nouveau type
-type State = {
+interface State {
     films: Film[],
     isLoading: boolean
 }
 
-class Search extends React.Component<Props, State> {
+class Search extends React.Component<NavigationProps, State> {
 
     searchString: string
     currentPage: number
     totalPages: number
 
-    constructor(props: Props) {
+    constructor(props: NavigationProps) {
         super(props)
         this.state = {
             films: [],
@@ -102,8 +98,7 @@ class Search extends React.Component<Props, State> {
     }
 
     private showFilmDetail = (filmId: string) => {
-        const { navigation } = this.props
-        navigation.navigate(NavigationComponents.Detail)
+        this.props.navigation.navigate(NavigationComponents.Detail, { filmId: filmId})
     }
 
     render() {

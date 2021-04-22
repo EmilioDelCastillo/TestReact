@@ -1,7 +1,8 @@
 import React from 'react'
 import { StyleSheet, View, Text } from 'react-native'
+import { NavigationProps } from '../Navigation/NavigationHelper';
 
-class FilmDetail extends React.Component {
+class FilmDetail extends React.Component<NavigationProps> {
     render() {
         return (
             <View style={styles.main_container}>
