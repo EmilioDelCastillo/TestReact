@@ -1,5 +1,5 @@
 import React from 'react'
-import { StyleSheet, View, Text, Image } from 'react-native'
+import { StyleSheet, View, Text, Image, ActivityIndicator } from 'react-native'
 import { ScrollView } from 'react-native-gesture-handler';
 import { NavigationProps } from '../Navigation/NavigationHelper';
 import { getMovieById, getImageFromAPI } from '../API/TMDBapi'
@@ -13,7 +13,8 @@ interface Movie {
 }
 
 interface State {
-    movie: Movie
+    movie?: Movie,
+    isLoading: boolean
 }
 
 class MovieDetail extends React.Component<NavigationProps, State> {
@@ -24,7 +25,8 @@ class MovieDetail extends React.Component<NavigationProps, State> {
 
         getMovieById<Movie>(movieId).then(data => {
             this.setState({
-                movie: data
+                movie: data,
+                isLoading: false
             })
         })
     }
@@ -32,19 +34,14 @@ class MovieDetail extends React.Component<NavigationProps, State> {
     constructor(props: NavigationProps) {
         super(props)
         this.state = {
-            movie: {
-                title: "",
-                release_date: "",
-                overview: "",
-                poster_path: ""
-            }
+            movie: undefined,
+            isLoading: true
         }
-        this.getMovie()
     }
 
-    render() {
-        return (
-            <View style={styles.main_container}>
+    private displayMovieDetails() {
+        if (this.state.movie) {
+            return (
                 <ScrollView>
                     <Image
                         style={styles.poster}
@@ -58,6 +55,29 @@ class MovieDetail extends React.Component<NavigationProps, State> {
 
                     <Text style={styles.description_text}>{this.state.movie.overview}</Text>
                 </ScrollView>
+            )
+        }
+    }
+
+    private displayActivityIndicator() {
+        if (this.state.isLoading) {
+            return (
+                <View style={styles.activity_indicator}>
+                    <ActivityIndicator size='large' />
+                </View>
+            )
+        }
+    }
+
+    componentDidMount() {
+        this.getMovie()
+    }
+
+    render() {
+        return (
+            <View style={styles.main_container}>
+                {this.displayMovieDetails()}
+                {this.displayActivityIndicator()}
             </View>
         )
     }
@@ -83,6 +103,15 @@ const styles = StyleSheet.create({
     },
     description_text: {
         margin: 10
+    },
+    activity_indicator: {
+        position: 'absolute', // Afficher par dessus tout
+        alignItems: 'center', // Centrer
+        justifyContent: 'center',
+        top: 0, // Laisser de l'espace pour les inputs en haut de l'écran
+        left: 0, // Mais se coller aux autres bords pour que le spinner soit bien au milieu
+        right: 0,
+        bottom: 0
     }
 })
 
