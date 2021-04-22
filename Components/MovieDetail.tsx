@@ -2,10 +2,10 @@ import React from 'react'
 import { StyleSheet, View, Text, Image } from 'react-native'
 import { ScrollView } from 'react-native-gesture-handler';
 import { NavigationProps } from '../Navigation/NavigationHelper';
-import { getFilmById, getImageFromAPI } from '../API/TMDBapi'
+import { getMovieById, getImageFromAPI } from '../API/TMDBapi'
 
 // What we need from the API
-interface Film {
+interface Movie {
     title: string,
     release_date: string,
     overview: string,
@@ -13,18 +13,18 @@ interface Film {
 }
 
 interface State {
-    film: Film
+    movie: Movie
 }
 
-class FilmDetail extends React.Component<NavigationProps, State> {
+class MovieDetail extends React.Component<NavigationProps, State> {
 
-    private getFilm() {
-        // We are certain that a filmId exists since it is sent by the navigation thingy
-        const filmId = this.props.navigation.state.params!.filmId as string
+    private getMovie() {
+        // We are certain that a movieId exists since it is sent by the navigation thingy
+        const movieId = this.props.navigation.state.params!.movieId as string
 
-        getFilmById<Film>(filmId).then(data => {
+        getMovieById<Movie>(movieId).then(data => {
             this.setState({
-                film: data
+                movie: data
             })
         })
     }
@@ -32,14 +32,14 @@ class FilmDetail extends React.Component<NavigationProps, State> {
     constructor(props: NavigationProps) {
         super(props)
         this.state = {
-            film: {
+            movie: {
                 title: "",
                 release_date: "",
                 overview: "",
                 poster_path: ""
             }
         }
-        this.getFilm()
+        this.getMovie()
     }
 
     render() {
@@ -48,15 +48,15 @@ class FilmDetail extends React.Component<NavigationProps, State> {
                 <ScrollView>
                     <Image
                         style={styles.poster}
-                        source={{ uri: getImageFromAPI(this.state.film.poster_path) }}
+                        source={{ uri: getImageFromAPI(this.state.movie.poster_path) }}
                         resizeMode="contain"
                     />
 
-                    <Text style={styles.title_text}>{this.state.film.title}</Text>
+                    <Text style={styles.title_text}>{this.state.movie.title}</Text>
 
-                    <Text style={styles.date_text}>{this.state.film.release_date}</Text>
+                    <Text style={styles.date_text}>{this.state.movie.release_date}</Text>
 
-                    <Text style={styles.description_text}>{this.state.film.overview}</Text>
+                    <Text style={styles.description_text}>{this.state.movie.overview}</Text>
                 </ScrollView>
             </View>
         )
@@ -86,4 +86,4 @@ const styles = StyleSheet.create({
     }
 })
 
-export default FilmDetail
+export default MovieDetail

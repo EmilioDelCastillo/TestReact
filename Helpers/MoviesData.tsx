@@ -1,4 +1,4 @@
-export interface Film {
+export interface Movie {
     // adult?: boolean,
     // backdrop_path?: string,
     // genre_ids?: Number[],
@@ -15,7 +15,7 @@ export interface Film {
     // vote_count?: number
 }
 
-let data: Film[] = [
+let data: Movie[] = [
     {
         id: 181808,
         vote_average: 7.2,

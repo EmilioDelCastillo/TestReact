@@ -1,10 +1,10 @@
 import React, { ReactNode } from 'react';
 import { StyleSheet, Button, TextInput, Text, View, FlatList, ActivityIndicator } from 'react-native';
-import { getFilmsFromAPIWithSearchedText } from '../API/TMDBapi';
+import { getMoviesFromAPIWithSearchedText } from '../API/TMDBapi';
 import type { APIResult } from '../API/TMDBapi'
 
-import FilmItem from './FilmItem';
-import type { Film } from '../Helpers/FilmsData'
+import MovieItem from './MovieItem';
+import type { Movie } from '../Helpers/MoviesData'
 import { NavigationComponents } from '../Navigation/NavigationHelper'
 import { NavigationProps } from '../Navigation/NavigationHelper';
 
@@ -36,7 +36,7 @@ const styles = StyleSheet.create({
 
 // Pour pouvoir donner une propriété à state, on crée un nouveau type
 interface State {
-    films: Film[],
+    movies: Movie[],
     isLoading: boolean
 }
 
@@ -49,7 +49,7 @@ class Search extends React.Component<NavigationProps, State> {
     constructor(props: NavigationProps) {
         super(props)
         this.state = {
-            films: [],
+            movies: [],
             isLoading: false
         }
         this.searchString = ""
@@ -57,20 +57,20 @@ class Search extends React.Component<NavigationProps, State> {
         this.totalPages = 0
     }
 
-    private loadFilms() {
+    private loadMovies() {
         if (this.searchString.length > 0) {
             this.setState({ isLoading: true })
-            getFilmsFromAPIWithSearchedText<APIResult>(this.searchString, this.currentPage + 1).then(data => {
+            getMoviesFromAPIWithSearchedText<APIResult>(this.searchString, this.currentPage + 1).then(data => {
                 this.currentPage = data.page
                 this.totalPages = data.total_pages
 
-                // Avoid duplicates, stupid API sometimes returns the same film on two different pages
-                let newFilms = data.results.filter(newFilm => {
-                    return this.state.films.findIndex(film => film.id == newFilm.id) == -1
+                // Avoid duplicates, stupid API sometimes returns the same movie on two different pages
+                let newMovies = data.results.filter(newMovie => {
+                    return this.state.movies.findIndex(movie => movie.id == newMovie.id) == -1
                 })
 
                 this.setState({
-                    films: [...this.state.films, ...newFilms],
+                    movies: [...this.state.movies, ...newMovies],
                     isLoading: false
                 })
             })
@@ -94,11 +94,11 @@ class Search extends React.Component<NavigationProps, State> {
     private resetSearch() {
         this.currentPage = 0
         this.totalPages = 0
-        this.setState({ films: [] })
+        this.setState({ movies: [] })
     }
 
-    private showFilmDetail = (filmId: string) => {
-        this.props.navigation.navigate(NavigationComponents.Detail, { filmId: filmId})
+    private showMovieDetail = (movieId: string) => {
+        this.props.navigation.navigate(NavigationComponents.Detail, { movieId: movieId})
     }
 
     render() {
@@ -107,32 +107,32 @@ class Search extends React.Component<NavigationProps, State> {
             <View style={styles.mainContainer}>
                 <TextInput
                     style={[styles.textInput, { backgroundColor: 'cyan' }]}
-                    placeholder="Titre du film"
+                    placeholder="Titre du movie"
 
                     // A chaque nouveau caractère on met à jour la chaîne de caractères à chercher
                     onChange={(event) => this.updateSearchString(event.nativeEvent.text)}
 
-                    // Lorsqu'on appuie sur "retour" ça charge la liste des films
+                    // Lorsqu'on appuie sur "retour" ça charge la liste des movies
                     onSubmitEditing={(event) => {
                         this.resetSearch()
-                        this.loadFilms()
+                        this.loadMovies()
                     }}
                 />
                 <Button title="Rechercher" onPress={() => {
                     this.resetSearch()
-                    this.loadFilms()
+                    this.loadMovies()
                 }} />
 
                 <FlatList
-                    data={this.state.films}
+                    data={this.state.movies}
                     keyExtractor={(item) => item.id.toString()}
 
-                    renderItem={({ item }) => <FilmItem film={item} didSelectFilm={this.showFilmDetail} />}
+                    renderItem={({ item }) => <MovieItem movie={item} didSelectMovie={this.showMovieDetail} />}
 
                     onEndReachedThreshold={0.5}
                     onEndReached={() => {
                         if (this.currentPage < this.totalPages) {
-                            this.loadFilms()
+                            this.loadMovies()
                         }
                     }}
                 />

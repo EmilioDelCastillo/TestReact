@@ -2,38 +2,38 @@ import React, { ReactNode } from "react";
 import { StyleSheet, Text, View, Image, Touchable } from "react-native";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { getImageFromAPI } from "../API/TMDBapi";
-import type { Film } from '../Helpers/FilmsData'
+import type { Movie } from '../Helpers/MoviesData'
 
-// Les props sont un objet, donc on fait un objet qui contient une propriété film de type Film
-class FilmItem extends React.Component<{ film: Film, didSelectFilm: (id: string) => void }> {
+// Les props sont un objet, donc on fait un objet qui contient une propriété movie de type Movie
+class MovieItem extends React.Component<{ movie: Movie, didSelectMovie: (id: string) => void }> {
 
     render() {
         // Pour éviter de le réécrire partout
-        const { film, didSelectFilm } = this.props
+        const { movie, didSelectMovie } = this.props
         return (
             <TouchableOpacity
                 style={styles.main_container}
-                onPress={() => didSelectFilm(film.id.toString())}
+                onPress={() => didSelectMovie(movie.id.toString())}
             >
                 <Image style={styles.thumbnail}
-                    source={{ uri: getImageFromAPI(film.poster_path) }} />
+                    source={{ uri: getImageFromAPI(movie.poster_path) }} />
 
                 {/* Content */}
                 <View style={styles.content_container}>
                     {/* Header */}
                     <View style={styles.header_container}>
-                        <Text style={styles.title_text}>{film.title}</Text>
-                        <Text style={styles.vote_text}>{film.vote_average}</Text>
+                        <Text style={styles.title_text}>{movie.title}</Text>
+                        <Text style={styles.vote_text}>{movie.vote_average}</Text>
                     </View>
 
                     {/* Description */}
                     <View style={styles.desciption_container}>
-                        <Text style={styles.description_text} numberOfLines={6}>{film.overview}</Text>
+                        <Text style={styles.description_text} numberOfLines={6}>{movie.overview}</Text>
                     </View>
 
                     {/* Date */}
                     <View style={styles.date_container}>
-                        <Text style={styles.date_text}>Sorti le {film.release_date}</Text>
+                        <Text style={styles.date_text}>Sorti le {movie.release_date}</Text>
                     </View>
 
                 </View>
@@ -94,4 +94,4 @@ const styles = StyleSheet.create({
     }
 })
 
-export default FilmItem
+export default MovieItem

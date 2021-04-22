@@ -9,7 +9,7 @@ export enum NavigationComponents {
      */
     Search = "Search",
     /**
-     * The film detail screen
+     * The movie detail screen
      */
     Detail = "Detail"
 }
