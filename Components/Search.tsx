@@ -92,11 +92,6 @@ class Search extends React.Component<NavigationProps, State> {
                         this.loadMovies()
                     }}
                 />
-                <Button title="Rechercher" onPress={() => {
-                    this.resetSearch()
-                    this.loadMovies()
-                }} />
-
                 <FlatList
                     data={this.state.movies}
                     keyExtractor={(item) => item.id.toString()}
