@@ -1,16 +1,20 @@
 import React, { ReactNode } from "react";
-import { StyleSheet, Text, View, Image } from "react-native";
+import { StyleSheet, Text, View, Image, Touchable } from "react-native";
+import { TouchableOpacity } from "react-native-gesture-handler";
 import { getImageFromAPI } from "../API/TMDBapi";
 import type { Film } from '../Helpers/FilmsData'
 
 // Les props sont un objet, donc on fait un objet qui contient une propriété film de type Film
-class FilmItem extends React.Component<{film: Film}> {
+class FilmItem extends React.Component<{ film: Film, didSelectFilm: (id: string) => void }> {
 
     render() {
         // Pour éviter de le réécrire partout
-        let film = this.props.film
+        const { film, didSelectFilm } = this.props
         return (
-            <View style={styles.main_container}>
+            <TouchableOpacity
+                style={styles.main_container}
+                onPress={() => didSelectFilm(film.id.toString())}
+            >
                 <Image style={styles.thumbnail}
                     source={{ uri: getImageFromAPI(film.poster_path) }} />
 
@@ -34,7 +38,7 @@ class FilmItem extends React.Component<{film: Film}> {
 
                 </View>
 
-            </View>
+            </TouchableOpacity>
         )
     }
 }

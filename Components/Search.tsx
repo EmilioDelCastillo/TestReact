@@ -5,12 +5,13 @@ import type { APIResult } from '../API/TMDBapi'
 
 import FilmItem from './FilmItem';
 import type { Film } from '../Helpers/FilmsData'
-// import defaultFilms from '../Helpers/FilmsData'
+import { NavigationParams, NavigationScreenProp, NavigationState } from 'react-navigation';
+import { NavigationComponents } from '../Navigation/NavigationHelper'
 
 const styles = StyleSheet.create({
     mainContainer: {
         flex: 1,
-        marginTop: 40
+        marginTop: 10
     },
 
     textInput: {
@@ -33,20 +34,23 @@ const styles = StyleSheet.create({
     }
 })
 
+// Pour pouvoir utiliser la navigation, on doit indiquer le type d'objet utilisé
+type Props = {
+    navigation: NavigationScreenProp<NavigationState, NavigationParams>
+}
 // Pour pouvoir donner une propriété à state, on crée un nouveau type
 type State = {
     films: Film[],
     isLoading: boolean
 }
 
-// Il faut une valeur par défaut pour props avant de pouvoir donner le type de state, d'où le {}
-class Search extends React.Component<{}, State> {
+class Search extends React.Component<Props, State> {
 
     searchString: string
     currentPage: number
     totalPages: number
 
-    constructor(props: {}) {
+    constructor(props: Props) {
         super(props)
         this.state = {
             films: [],
@@ -97,6 +101,11 @@ class Search extends React.Component<{}, State> {
         this.setState({ films: [] })
     }
 
+    private showFilmDetail = (filmId: string) => {
+        const { navigation } = this.props
+        navigation.navigate(NavigationComponents.Detail)
+    }
+
     render() {
         return (
             // Ici on rend à l'écran les éléments graphiques de notre component custom Search
@@ -122,7 +131,9 @@ class Search extends React.Component<{}, State> {
                 <FlatList
                     data={this.state.films}
                     keyExtractor={(item) => item.id.toString()}
-                    renderItem={({ item }) => <FilmItem film={item} />}
+
+                    renderItem={({ item }) => <FilmItem film={item} didSelectFilm={this.showFilmDetail} />}
+
                     onEndReachedThreshold={0.5}
                     onEndReached={() => {
                         if (this.currentPage < this.totalPages) {
