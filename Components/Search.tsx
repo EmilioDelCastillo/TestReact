@@ -8,32 +8,6 @@ import type { Movie } from '../Helpers/MoviesData'
 import { NavigationComponents } from '../Navigation/NavigationHelper'
 import { NavigationProps } from '../Navigation/NavigationHelper';
 
-const styles = StyleSheet.create({
-    mainContainer: {
-        flex: 1,
-        marginTop: 10
-    },
-
-    textInput: {
-        marginLeft: 5,
-        marginRight: 5,
-        height: 50,
-        borderColor: '#000000',
-        borderWidth: 1,
-        paddingLeft: 5
-    },
-
-    activity_indicator: {
-        position: 'absolute', // Afficher par dessus tout
-        alignItems: 'center', // Centrer
-        justifyContent: 'center',
-        top: 100, // Laisser de l'espace pour les inputs en haut de l'écran
-        left: 0, // Mais se coller aux autres bords pour que le spinner soit bien au milieu
-        right: 0,
-        bottom: 0
-    }
-})
-
 // Pour pouvoir donner une propriété à state, on crée un nouveau type
 interface State {
     movies: Movie[],
@@ -141,5 +115,31 @@ class Search extends React.Component<NavigationProps, State> {
         )
     }
 }
+
+const styles = StyleSheet.create({
+    mainContainer: {
+        flex: 1,
+        marginTop: 10
+    },
+
+    textInput: {
+        marginLeft: 5,
+        marginRight: 5,
+        height: 50,
+        borderColor: '#000000',
+        borderWidth: 1,
+        paddingLeft: 5
+    },
+
+    activity_indicator: {
+        position: 'absolute', // Afficher par dessus tout
+        alignItems: 'center', // Centrer
+        justifyContent: 'center',
+        top: 100, // Laisser de l'espace pour les inputs en haut de l'écran
+        left: 0, // Mais se coller aux autres bords pour que le spinner soit bien au milieu
+        right: 0,
+        bottom: 0
+    }
+})
 
 export default Search;
