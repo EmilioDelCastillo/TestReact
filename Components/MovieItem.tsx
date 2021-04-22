@@ -2,7 +2,7 @@ import React, { ReactNode } from "react";
 import { StyleSheet, Text, View, Image, Touchable } from "react-native";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { getImageFromAPI } from "../API/TMDBapi";
-import type { Movie } from '../Helpers/MoviesData'
+import type { Movie } from '../Helpers/moviesData'
 
 // Les props sont un objet, donc on fait un objet qui contient une propriété movie de type Movie
 class MovieItem extends React.Component<{ movie: Movie, didSelectMovie: (id: string) => void }> {

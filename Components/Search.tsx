@@ -4,7 +4,7 @@ import { getMoviesFromAPIWithSearchedText } from '../API/TMDBapi';
 import type { APIResult } from '../API/TMDBapi'
 
 import MovieItem from './MovieItem';
-import type { Movie } from '../Helpers/MoviesData'
+import type { Movie } from '../Helpers/moviesData'
 import { NavigationComponents } from '../Navigation/NavigationHelper'
 import { NavigationProps } from '../Navigation/NavigationHelper';
 

@@ -1,4 +1,4 @@
-import type { Movie } from '../Helpers/MoviesData'
+import type { Movie } from '../Helpers/moviesData'
 const API_TOKEN = "89d8d892881ebf5609e3a525def2c975"
 
 // L'API retourne un numéro de page et un tableau results avec les films dedans
