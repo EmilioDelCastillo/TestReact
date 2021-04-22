@@ -61,12 +61,16 @@ class Search extends React.Component<{}, State> {
         if (this.searchString.length > 0) {
             this.setState({ isLoading: true })
             getFilmsFromAPIWithSearchedText<APIResult>(this.searchString, this.currentPage + 1).then(data => {
-                console.log(this.state.films.length)
                 this.currentPage = data.page
                 this.totalPages = data.total_pages
+
+                // Avoid duplicates, stupid API sometimes returns the same film on two different pages
+                let newFilms = data.results.filter(newFilm => {
+                    return this.state.films.findIndex(film => film.id == newFilm.id) == -1
+                })
+
                 this.setState({
-                    // The first time we want to override the default films
-                    films: [...this.state.films, ...data.results],
+                    films: [...this.state.films, ...newFilms],
                     isLoading: false
                 })
             })
