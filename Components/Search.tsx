@@ -1,15 +1,11 @@
 import React, { Dispatch } from 'react';
-import { StyleSheet, TextInput, View, FlatList, ActivityIndicator } from 'react-native';
+import { StyleSheet, TextInput, View, ActivityIndicator } from 'react-native';
 import { getMoviesFromAPIWithSearchedText } from '../API/TMDBapi';
 import type { APIResult } from '../API/TMDBapi'
 
-import MovieItem from './MovieItem';
 import type { Movie } from '../Helpers/moviesData'
-import { NavigationComponents } from '../Navigation/NavigationHelper'
 import { NavigationProps } from '../Navigation/NavigationHelper';
-import { connect } from 'react-redux'
-import { Action } from 'redux';
-import { GlobalState } from '../Store/Reducers/favouriteReducer';
+import MovieList from './MovieList'
 
 // Pour pouvoir donner une propriété à state, on crée un nouveau type
 interface State {
@@ -17,7 +13,7 @@ interface State {
     isLoading: boolean
 }
 
-class Search extends React.Component<NavigationProps & ReduxType, State> {
+class Search extends React.Component<NavigationProps, State> {
 
     /**
      * The string parameter given to the API.
@@ -34,7 +30,7 @@ class Search extends React.Component<NavigationProps & ReduxType, State> {
      */
     private totalPages: number
 
-    constructor(props: NavigationProps & ReduxType) {
+    constructor(props: NavigationProps ) {
         super(props)
         this.state = {
             movies: [],
@@ -48,7 +44,7 @@ class Search extends React.Component<NavigationProps & ReduxType, State> {
     /**
      * Updates the state with the list of movies coming from the network call.
      */
-    private loadMovies() {
+    private loadMovies = () => {
         if (this.searchString.length > 0) {
             this.setState({ isLoading: true })
             getMoviesFromAPIWithSearchedText<APIResult>(this.searchString, this.currentPage + 1).then(data => {
@@ -99,23 +95,6 @@ class Search extends React.Component<NavigationProps & ReduxType, State> {
         this.setState({ movies: [] })
     }
 
-    /**
-     * Navigates to the MovieDetails component.
-     * @param movieId The identifier of the movie whose details will be displayed.
-     */
-    private showMovieDetail = (movieId: string) => {
-        this.props.navigation.navigate(NavigationComponents.Detail, { movieId: movieId })
-    }
-
-    /**
-     * Returns a boolean indicating if the movie is a favourite movie.
-     * @param id The movie identifier.
-     * @returns true if the movie is among the favourite movies, false otherwise.
-     */
-    private isMovieFavourite(id: number): boolean {
-        return this.props.favouriteMovies.findIndex(movie => movie.id.toString() == id.toString()) != -1
-    }
-
     render() {
         return (
             // Ici on rend à l'écran les éléments graphiques de notre component custom Search
@@ -133,25 +112,12 @@ class Search extends React.Component<NavigationProps & ReduxType, State> {
                         this.loadMovies()
                     }}
                 />
-                <FlatList
-                    data={this.state.movies}
-                    // This tells the flatlist that extra data has to be checked when asked to re-render
-                    extraData={this.props.favouriteMovies}
-
-                    keyExtractor={(item) => item.id.toString()}
-
-                    renderItem={({ item }) => <MovieItem
-                        movie={item}
-                        didSelectMovie={this.showMovieDetail}
-                        isMovieFavourite={this.isMovieFavourite(item.id)} />
-                    }
-
-                    onEndReachedThreshold={0.5}
-                    onEndReached={() => {
-                        if (this.currentPage < this.totalPages) {
-                            this.loadMovies()
-                        }
-                    }}
+                <MovieList
+                    movies={this.state.movies}
+                    navigation={this.props.navigation}
+                    loadMovies={this.loadMovies}
+                    page={this.currentPage}
+                    totalPages={this.totalPages}
                 />
                 {this.displayActivityIndicator()}
             </View>
@@ -185,18 +151,4 @@ const styles = StyleSheet.create({
     }
 })
 
-const mapStateToProps = (state: GlobalState) => {
-    return {
-        favouriteMovies: state.favouriteMovies
-    }
-}
-
-const mapDispatcherToProps = (dispatch: Dispatch<Action>) => {
-    return {
-        dispatch: (action: Action) => { dispatch(action) }
-    }
-}
-
-type ReduxType = ReturnType<typeof mapDispatcherToProps> & ReturnType<typeof mapStateToProps>
-
-export default connect(mapStateToProps, mapDispatcherToProps)(Search)
+export default Search
