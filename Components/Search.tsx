@@ -19,9 +19,20 @@ interface State {
 
 class Search extends React.Component<NavigationProps & ReduxType, State> {
 
-    searchString: string
-    currentPage: number
-    totalPages: number
+    /**
+     * The string parameter given to the API.
+     */
+    private searchString: string
+
+    /**
+     * The current page from the API results.
+     */
+    private currentPage: number
+
+    /**
+     * The total number of pages given by the API.
+     */
+    private totalPages: number
 
     constructor(props: NavigationProps & ReduxType) {
         super(props)
@@ -34,6 +45,9 @@ class Search extends React.Component<NavigationProps & ReduxType, State> {
         this.totalPages = 0
     }
 
+    /**
+     * Updates the state with the list of movies coming from the network call.
+     */
     private loadMovies() {
         if (this.searchString.length > 0) {
             this.setState({ isLoading: true })
@@ -54,11 +68,19 @@ class Search extends React.Component<NavigationProps & ReduxType, State> {
         }
     }
 
+    /**
+     * Updates the `searchString` property.
+     * @param text The new string
+     */
     private updateSearchString(text: string) {
         this.searchString = text
     }
 
-    private displayActivityIndicator() {
+    /**
+     * Returns an activity indicator to be displayed if `state.isLoading` is true.
+     * @returns A View with an ActivityIndicator when its needed, *undefined* otherwise.
+     */
+    private displayActivityIndicator(): JSX.Element | undefined {
         if (this.state.isLoading) {
             return (
                 <View style={styles.activity_indicator}>
@@ -68,17 +90,29 @@ class Search extends React.Component<NavigationProps & ReduxType, State> {
         }
     }
 
+    /**
+     * Resets the current search. This allows a new search to start on fresh grounds.
+     */
     private resetSearch() {
         this.currentPage = 0
         this.totalPages = 0
         this.setState({ movies: [] })
     }
 
+    /**
+     * Navigates to the MovieDetails component.
+     * @param movieId The identifier of the movie whose details will be displayed.
+     */
     private showMovieDetail = (movieId: string) => {
         this.props.navigation.navigate(NavigationComponents.Detail, { movieId: movieId })
     }
 
-    private isMovieFavourite(id: number) {
+    /**
+     * Returns a boolean indicating if the movie is a favourite movie.
+     * @param id The movie identifier.
+     * @returns true if the movie is among the favourite movies, false otherwise.
+     */
+    private isMovieFavourite(id: number): boolean {
         return this.props.favouriteMovies.findIndex(movie => movie.id.toString() == id.toString()) != -1
     }
 
