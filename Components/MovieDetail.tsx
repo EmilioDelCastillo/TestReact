@@ -14,7 +14,7 @@ interface State {
     isLoading: boolean
 }
 
-interface Props extends NavigationProps, ReduxType {}
+interface Props extends NavigationProps, ReduxType { }
 
 class MovieDetail extends React.Component<Props, State> {
 
@@ -22,12 +22,21 @@ class MovieDetail extends React.Component<Props, State> {
         // We are certain that a movieId exists since it is sent by the navigation thingy
         const movieId = this.props.navigation.state.params!.movieId as string
 
-        getMovieById<Movie>(movieId).then(data => {
+        const favouriteMovieIndex = this.props.favouriteMovies.findIndex(movie => movie.id.toString() == movieId)
+        if (favouriteMovieIndex != -1) {
+            // Movie is in the favourites, no need to ask its details to the API
             this.setState({
-                movie: data,
+                movie: this.props.favouriteMovies[favouriteMovieIndex],
                 isLoading: false
             })
-        })
+        } else {
+            getMovieById<Movie>(movieId).then(data => {
+                this.setState({
+                    movie: data,
+                    isLoading: false
+                })
+            })
+        }
     }
 
     constructor(props: Props) {

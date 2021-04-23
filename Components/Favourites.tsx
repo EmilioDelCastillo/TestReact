@@ -1,14 +1,31 @@
 import React from 'react'
-import { View } from 'react-native'
+import { connect } from 'react-redux'
+import { NavigationProps } from '../Navigation/NavigationHelper'
+import { GlobalState } from '../Store/Reducers/favouriteReducer'
+import MovieList from './MovieList'
 
-class Favourites extends React.Component {
+interface Props extends ReduxType { }
+
+class Favourites extends React.Component<Props & NavigationProps> {
     render() {
         return (
-            <View>
-
-            </View>
+            <MovieList
+                movies={this.props.favouriteMovies}
+                loadMovies={() => { }}
+                page={1}
+                totalPages={1}
+                navigation={this.props.navigation}
+            />
         )
     }
 }
 
-export default Favourites
+
+const mapStateToProps = (state: GlobalState) => {
+    return {
+        favouriteMovies: state.favouriteMovies
+    }
+}
+
+type ReduxType = ReturnType<typeof mapStateToProps>
+export default connect(mapStateToProps)(Favourites)
