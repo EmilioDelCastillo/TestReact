@@ -1,10 +1,10 @@
 export interface Movie {
     // adult?: boolean,
     // backdrop_path?: string,
-    // genre_ids?: Number[],
+    // genre_ids?: number[],
     // original_language?: string,
-    id: Number,
-    vote_average: Number,
+    id: number,
+    vote_average: number,
     title: string,
     poster_path: string,
     original_title: string,
