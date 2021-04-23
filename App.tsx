@@ -3,10 +3,12 @@ import Navigation from './Navigation/Navigation'
 import { Provider } from 'react-redux'
 import Store from './Store/configureStore'
 
-export default function App() {
-  return (
-    <Provider store={Store}>
-      <Navigation/>
-    </Provider>
-  )
+export default class App extends React.Component {
+  render() {
+    return (
+      <Provider store={Store}>
+        <Navigation/>
+      </Provider>
+    )
+  }
 }
