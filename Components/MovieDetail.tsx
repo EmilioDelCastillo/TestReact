@@ -1,23 +1,21 @@
-import React from 'react'
+import React, { Dispatch } from 'react'
 import { StyleSheet, View, Text, Image, ActivityIndicator } from 'react-native'
-import { ScrollView } from 'react-native-gesture-handler';
+import { ScrollView, TouchableOpacity } from 'react-native-gesture-handler';
 import { NavigationProps } from '../Navigation/NavigationHelper';
 import { getMovieById, getImageFromAPI } from '../API/TMDBapi'
-
-// What we need from the API
-interface Movie {
-    title: string,
-    release_date: string,
-    overview: string,
-    poster_path: string
-}
+import { connect } from 'react-redux'
+import { GlobalState } from '../Store/Reducers/favouriteReducer'
+import type { Action } from '../Store/Reducers/favouriteReducer'
+import type { Movie } from '../Helpers/moviesData'
+import * as actionTypes from '../Store/actionTypes'
 
 interface State {
     movie?: Movie,
     isLoading: boolean
 }
 
-class MovieDetail extends React.Component<NavigationProps, State> {
+
+class MovieDetail extends React.Component<ReduxType & NavigationProps, State> {
 
     private getMovie() {
         // We are certain that a movieId exists since it is sent by the navigation thingy
@@ -31,12 +29,27 @@ class MovieDetail extends React.Component<NavigationProps, State> {
         })
     }
 
-    constructor(props: NavigationProps) {
+    constructor(props: NavigationProps & ReduxType) {
         super(props)
         this.state = {
             movie: undefined,
             isLoading: true
         }
+    }
+
+    private toggleFavourite() {
+        const action: Action = { type: actionTypes.TOGGLE_FAVOURITE, value: this.state.movie! }
+        this.props.dispatch(action)
+    }
+
+    private displayFavouriteImage() {
+        var sourceImage = require("../Images/ic_favourite_border.png")
+        if (this.props.favouriteMovies.findIndex(movie => movie.id == this.state.movie?.id) != -1) {
+            sourceImage = require("../Images/ic_favourite.png")
+        }
+        return (
+            <Image style={styles.favourite_image} source={sourceImage} />
+        )
     }
 
     private displayMovieDetails() {
@@ -52,6 +65,12 @@ class MovieDetail extends React.Component<NavigationProps, State> {
                     <Text style={styles.title_text}>{this.state.movie.title}</Text>
 
                     <Text style={styles.date_text}>{this.state.movie.release_date}</Text>
+
+                    <TouchableOpacity
+                        style={styles.favourites_container}
+                        onPress={() => this.toggleFavourite()}>
+                        {this.displayFavouriteImage()}
+                    </TouchableOpacity>
 
                     <Text style={styles.description_text}>{this.state.movie.overview}</Text>
                 </ScrollView>
@@ -112,7 +131,28 @@ const styles = StyleSheet.create({
         left: 0, // Mais se coller aux autres bords pour que le spinner soit bien au milieu
         right: 0,
         bottom: 0
+    },
+    favourites_container: {
+        alignItems: 'center'
+    },
+    favourite_image: {
+        height: 40,
+        width: 40
     }
 })
 
-export default MovieDetail
+const mapStateToProps = (state: GlobalState) => {
+    return {
+        favouriteMovies: state.favouriteMovies
+    }
+}
+
+const mapDispatcherToProps = (dispatch: Dispatch<Action>) => {
+    return {
+        dispatch: (action: Action) => { dispatch(action) }
+    }
+}
+
+type ReduxType = ReturnType<typeof mapDispatcherToProps> & ReturnType<typeof mapStateToProps>
+
+export default connect(mapStateToProps, mapDispatcherToProps)(MovieDetail)

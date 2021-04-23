@@ -1,5 +1,5 @@
-import React, { ReactNode } from 'react';
-import { StyleSheet, Button, TextInput, Text, View, FlatList, ActivityIndicator } from 'react-native';
+import React, { Dispatch } from 'react';
+import { StyleSheet, TextInput, View, FlatList, ActivityIndicator } from 'react-native';
 import { getMoviesFromAPIWithSearchedText } from '../API/TMDBapi';
 import type { APIResult } from '../API/TMDBapi'
 
@@ -7,6 +7,9 @@ import MovieItem from './MovieItem';
 import type { Movie } from '../Helpers/moviesData'
 import { NavigationComponents } from '../Navigation/NavigationHelper'
 import { NavigationProps } from '../Navigation/NavigationHelper';
+import { connect } from 'react-redux'
+import { Action } from 'redux';
+import { GlobalState } from '../Store/Reducers/favouriteReducer';
 
 // Pour pouvoir donner une propriété à state, on crée un nouveau type
 interface State {
@@ -14,13 +17,13 @@ interface State {
     isLoading: boolean
 }
 
-class Search extends React.Component<NavigationProps, State> {
+class Search extends React.Component<NavigationProps & ReduxType, State> {
 
     searchString: string
     currentPage: number
     totalPages: number
 
-    constructor(props: NavigationProps) {
+    constructor(props: NavigationProps & ReduxType) {
         super(props)
         this.state = {
             movies: [],
@@ -72,7 +75,11 @@ class Search extends React.Component<NavigationProps, State> {
     }
 
     private showMovieDetail = (movieId: string) => {
-        this.props.navigation.navigate(NavigationComponents.Detail, { movieId: movieId})
+        this.props.navigation.navigate(NavigationComponents.Detail, { movieId: movieId })
+    }
+
+    private isMovieFavourite(id: number) {
+        return this.props.favouriteMovies.findIndex(movie => movie.id.toString() == id.toString()) != -1
     }
 
     render() {
@@ -94,9 +101,16 @@ class Search extends React.Component<NavigationProps, State> {
                 />
                 <FlatList
                     data={this.state.movies}
+                    // This tells the flatlist that extra data has to be checked when asked to re-render
+                    extraData={this.props.favouriteMovies}
+
                     keyExtractor={(item) => item.id.toString()}
 
-                    renderItem={({ item }) => <MovieItem movie={item} didSelectMovie={this.showMovieDetail} />}
+                    renderItem={({ item }) => <MovieItem
+                        movie={item}
+                        didSelectMovie={this.showMovieDetail}
+                        isMovieFavourite={this.isMovieFavourite(item.id)} />
+                    }
 
                     onEndReachedThreshold={0.5}
                     onEndReached={() => {
@@ -137,4 +151,18 @@ const styles = StyleSheet.create({
     }
 })
 
-export default Search;
+const mapStateToProps = (state: GlobalState) => {
+    return {
+        favouriteMovies: state.favouriteMovies
+    }
+}
+
+const mapDispatcherToProps = (dispatch: Dispatch<Action>) => {
+    return {
+        dispatch: (action: Action) => { dispatch(action) }
+    }
+}
+
+type ReduxType = ReturnType<typeof mapDispatcherToProps> & ReturnType<typeof mapStateToProps>
+
+export default connect(mapStateToProps, mapDispatcherToProps)(Search)

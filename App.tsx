@@ -1,12 +1,12 @@
-import React from 'react';
-import Navigation from './Navigation/Navigation';
+import React from 'react'
+import Navigation from './Navigation/Navigation'
+import { Provider } from 'react-redux'
+import Store from './Store/configureStore'
 
 export default function App() {
   return (
-    // <View style={styles.container}>
-    //   <Text>Howdy, motherfucker!</Text>
-    //   <StatusBar style="auto" />
-    // </View>
-    <Navigation/>
-  );
+    <Provider store={Store}>
+      <Navigation/>
+    </Provider>
+  )
 }

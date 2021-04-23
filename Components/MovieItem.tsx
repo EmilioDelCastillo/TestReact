@@ -4,8 +4,23 @@ import { TouchableOpacity } from "react-native-gesture-handler";
 import { getImageFromAPI } from "../API/TMDBapi";
 import type { Movie } from '../Helpers/moviesData'
 
-// Les props sont un objet, donc on fait un objet qui contient une propriété movie de type Movie
-class MovieItem extends React.Component<{ movie: Movie, didSelectMovie: (id: string) => void }> {
+// To my understanding, props are objects.
+// So we create an iterface to type the contents of the Props
+interface Props {
+    movie: Movie,
+    didSelectMovie: (id: string) => void,
+    isMovieFavourite: boolean
+}
+
+class MovieItem extends React.Component<Props> {
+    private displayFavouriteImage() {
+        if (this.props.isMovieFavourite) {
+            var sourceImage = require("../Images/ic_favourite.png")
+            return (
+                <Image style={styles.favourite_image} source={sourceImage} />
+            )
+        }
+    }
 
     render() {
         // Pour éviter de le réécrire partout
@@ -22,6 +37,7 @@ class MovieItem extends React.Component<{ movie: Movie, didSelectMovie: (id: str
                 <View style={styles.content_container}>
                     {/* Header */}
                     <View style={styles.header_container}>
+                        {this.displayFavouriteImage()}
                         <Text style={styles.title_text}>{movie.title}</Text>
                         <Text style={styles.vote_text}>{movie.vote_average}</Text>
                     </View>
@@ -64,6 +80,10 @@ const styles = StyleSheet.create({
     header_container: {
         flex: 3,
         flexDirection: 'row',
+    },
+    favourite_image: {
+        height: 30,
+        width: 30
     },
     title_text: {
         flex: 1,
