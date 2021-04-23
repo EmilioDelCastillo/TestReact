@@ -14,8 +14,9 @@ interface State {
     isLoading: boolean
 }
 
+interface Props extends NavigationProps, ReduxType {}
 
-class MovieDetail extends React.Component<ReduxType & NavigationProps, State> {
+class MovieDetail extends React.Component<Props, State> {
 
     private getMovie() {
         // We are certain that a movieId exists since it is sent by the navigation thingy
@@ -29,7 +30,7 @@ class MovieDetail extends React.Component<ReduxType & NavigationProps, State> {
         })
     }
 
-    constructor(props: NavigationProps & ReduxType) {
+    constructor(props: Props) {
         super(props)
         this.state = {
             movie: undefined,

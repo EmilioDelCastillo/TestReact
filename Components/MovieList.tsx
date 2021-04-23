@@ -1,26 +1,30 @@
 import React from "react"
 import { FlatList, StyleSheet } from "react-native"
 import { connect } from "react-redux"
-import { Dispatch } from "redux"
 import { Movie } from "../Helpers/moviesData"
 import { NavigationComponents, NavigationProps } from "../Navigation/NavigationHelper"
-import { Action, GlobalState } from "../Store/Reducers/favouriteReducer"
+import { GlobalState } from "../Store/Reducers/favouriteReducer"
 import MovieItem from "./MovieItem"
 
-interface Props {
+interface Props extends ReduxType, NavigationProps{
     movies: Movie[],
     loadMovies: () => void
     page: number
     totalPages: number
 }
 
-class MovieList extends React.Component<Props & NavigationProps & ReduxType> {
+class MovieList extends React.Component<Props> {
+
+    constructor(props: Props) {
+        super(props)
+        this.showMovieDetail = this.showMovieDetail.bind(this)
+    }
 
     /**
      * Navigates to the MovieDetails component.
      * @param movieId The identifier of the movie whose details will be displayed.
      */
-     private showMovieDetail = (movieId: string) => {
+    private showMovieDetail(movieId: string) {
         this.props.navigation.navigate(NavigationComponents.Detail, { movieId: movieId })
     }
 
@@ -36,31 +40,31 @@ class MovieList extends React.Component<Props & NavigationProps & ReduxType> {
     render() {
         return (
             <FlatList
-                    style={styles.list}
-                    data={this.props.movies}
-                    // This tells the flatlist that extra data has to be checked when asked to re-render
-                    extraData={this.props.favouriteMovies}
+                style={styles.list}
+                data={this.props.movies}
+                // This tells the flatlist that extra data has to be checked when asked to re-render
+                extraData={this.props.favouriteMovies}
 
-                    keyExtractor={(item) => item.id.toString()}
+                keyExtractor={(item) => item.id.toString()}
 
-                    renderItem={({ item }) => <MovieItem
-                        movie={item}
-                        didSelectMovie={this.showMovieDetail}
-                        isMovieFavourite={this.isMovieFavourite(item.id)} />
+                renderItem={({ item }) => <MovieItem
+                    movie={item}
+                    didSelectMovie={this.showMovieDetail}
+                    isMovieFavourite={this.isMovieFavourite(item.id)} />
+                }
+
+                onEndReachedThreshold={0.5}
+                onEndReached={() => {
+                    if (this.props.page < this.props.totalPages) {
+                        this.props.loadMovies()
                     }
-
-                    onEndReachedThreshold={0.5}
-                    onEndReached={() => {
-                        if (this.props.page < this.props.totalPages) {
-                            this.props.loadMovies()
-                        }
-                    }}
-                />
+                }}
+            />
         )
     }
 }
 
-const styles = StyleSheet.create ({
+const styles = StyleSheet.create({
     list: {
         flex: 1
     }

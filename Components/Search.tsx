@@ -30,7 +30,7 @@ class Search extends React.Component<NavigationProps, State> {
      */
     private totalPages: number
 
-    constructor(props: NavigationProps ) {
+    constructor(props: NavigationProps) {
         super(props)
         this.state = {
             movies: [],
@@ -39,12 +39,13 @@ class Search extends React.Component<NavigationProps, State> {
         this.searchString = ""
         this.currentPage = 0
         this.totalPages = 0
+        this.loadMovies = this.loadMovies.bind(this)
     }
 
     /**
      * Updates the state with the list of movies coming from the network call.
      */
-    private loadMovies = () => {
+    private loadMovies() {
         if (this.searchString.length > 0) {
             this.setState({ isLoading: true })
             getMoviesFromAPIWithSearchedText<APIResult>(this.searchString, this.currentPage + 1).then(data => {
@@ -107,7 +108,7 @@ class Search extends React.Component<NavigationProps, State> {
                     onChange={(event) => this.updateSearchString(event.nativeEvent.text)}
 
                     // Lorsqu'on appuie sur "retour" ça charge la liste des movies
-                    onSubmitEditing={(event) => {
+                    onSubmitEditing={() => {
                         this.resetSearch()
                         this.loadMovies()
                     }}
