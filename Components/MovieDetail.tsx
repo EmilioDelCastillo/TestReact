@@ -1,5 +1,5 @@
 import React, { Dispatch } from 'react'
-import { StyleSheet, View, Text, Image, ActivityIndicator } from 'react-native'
+import { StyleSheet, View, Text, Image, ActivityIndicator, Share, Platform } from 'react-native'
 import { ScrollView, TouchableOpacity } from 'react-native-gesture-handler';
 import { NavigationProps } from '../Navigation/NavigationHelper';
 import { getMovieById, getImageFromAPI } from '../API/TMDBapi'
@@ -18,6 +18,15 @@ interface Props extends NavigationProps, ReduxType { }
 
 class MovieDetail extends React.Component<Props, State> {
 
+    constructor(props: Props) {
+        super(props)
+        this.state = {
+            movie: undefined,
+            isLoading: true
+        }
+        this.shareMovie = this.shareMovie.bind(this)
+    }
+
     private getMovie() {
         // We are certain that a movieId exists since it is sent by the navigation thingy
         const movieId = this.props.navigation.state.params!.movieId as string
@@ -28,22 +37,14 @@ class MovieDetail extends React.Component<Props, State> {
             this.setState({
                 movie: this.props.favouriteMovies[favouriteMovieIndex],
                 isLoading: false
-            })
+            }, () => this.updateNavigationParams())
         } else {
             getMovieById<Movie>(movieId).then(data => {
                 this.setState({
                     movie: data,
                     isLoading: false
-                })
+                }, () => this.updateNavigationParams())
             })
-        }
-    }
-
-    constructor(props: Props) {
-        super(props)
-        this.state = {
-            movie: undefined,
-            isLoading: true
         }
     }
 
@@ -98,6 +99,54 @@ class MovieDetail extends React.Component<Props, State> {
         }
     }
 
+    private shareMovie() {
+        const { movie } = this.state
+        if (movie) {
+            Share.share({ title: movie.title, message: movie.overview })
+        }
+    }
+
+    private displayFloatingActionButton() {
+        const { movie } = this.state
+        if (movie && Platform.OS == "android") {
+            return (
+                <TouchableOpacity
+                    style={styles.share_touchable_floatingActionButton}
+                    onPress={() => this.shareMovie()} >
+                    <Image
+                        style={styles.share_image}
+                        source={require('../Images/ic_share.android.png')} />
+                </TouchableOpacity>
+            )
+        }
+
+    }
+
+    static navigationOptions = ({ navigation }: NavigationProps) => {
+        const { params } = navigation.state
+        if (params!.movie && Platform.OS == "ios") {
+            return {
+                headerRight: () => {
+                    return (
+                        <TouchableOpacity
+                            style={styles.share_touchable_headerRightButton}
+                            onPress={() => params!.shareMovie()} >
+                            <Image
+                                style={styles.share_image}
+                                source={require("../Images/ic_share.ios.png")} />
+                        </TouchableOpacity>)
+                }
+            }
+        }
+    }
+
+    private updateNavigationParams() {
+        this.props.navigation.setParams({
+            shareMovie: this.shareMovie,
+            movie: this.state.movie
+        })
+    }
+
     componentDidMount() {
         this.getMovie()
     }
@@ -107,6 +156,7 @@ class MovieDetail extends React.Component<Props, State> {
             <View style={styles.main_container}>
                 {this.displayMovieDetails()}
                 {this.displayActivityIndicator()}
+                {this.displayFloatingActionButton()}
             </View>
         )
     }
@@ -148,6 +198,24 @@ const styles = StyleSheet.create({
     favourite_image: {
         height: 40,
         width: 40
+    },
+    share_touchable_floatingActionButton: {
+        position: "absolute",
+        width: 60,
+        height: 60,
+        right: 30,
+        bottom: 30,
+        borderRadius: 30,
+        backgroundColor: "#e91e63",
+        justifyContent: "center",
+        alignItems: "center"
+    },
+    share_image: {
+        width: 30,
+        height: 30
+    },
+    share_touchable_headerRightButton: {
+        marginRight: 8
     }
 })
 
